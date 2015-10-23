@@ -1,0 +1,22 @@
+Package: threddscrawler
+Title: A limited THREDDS crawler for programmatically navigation THREDDS
+    catalogs
+Version: 0.1
+Depends:
+    R (>= 3.0)
+Imports:
+    methods,
+    httr,
+    XML
+Maintainer: Ben Tupper <btupper@bigelow.org>
+Author: Ben Tupper <btupper@bigelow.org>
+URL: https://github.com/btupper/threddscrawler
+License: GPL (>= 2)
+Collate:
+    'Thredds.R'
+    'Catalog.R'
+    'Datasets.R'
+    'Dataset.R'
+    'Service.R'
+    'TopCatalog.R'
+    'misc.R'
