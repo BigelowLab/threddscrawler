@@ -1,4 +1,4 @@
-#### THREDDS Crawler
+#### THREDDS Crawler for R
 
 
 #### Requirements
@@ -35,7 +35,7 @@ We start by examining the [catalog](http://www.neracoos.org/thredds/catalog/GMRI
 
 We'll crawl these pages in succession...
 
-[Top](http://www.neracoos.org/thredds/catalog/GMRI/SST/TESTS/NASA_MUR_SST/catalog.html]
+[Top](http://www.neracoos.org/thredds/catalog/GMRI/SST/TESTS/NASA_MUR_SST/catalog.html)
 
 [NorthEastShelf](http://www.neracoos.org/thredds/catalog/GMRI/SST/TESTS/NASA_MUR_SST/NorthEastShelf/catalog.html)
 
@@ -61,7 +61,7 @@ Top
 # now get the catalogs embedded in the page.  Note that these point to other TopCatalogs.
 A <- Top$get_catalogs()
 A
-$NorthEastShelf
+# $NorthEastShelf
 # Reference Class: "CatalogRefClass"
 #   verbose_mode: FALSE
 #   url: http://www.neracoos.org/thredds/catalog/GMRI/SST/TESTS/NASA_MUR_SST/NorthEastShelf/catalog.xml
@@ -94,12 +94,10 @@ NES
   
 # let's get the catalogs.  I won't show them, but we'll get the TopCatalog for the 'DailyFiles'
 B <- NES$get_catalogs()
-
 DAYS <- B[['DailyFiles']]$get_catalog()
 
-# now 
+# now get 2010
 C <- DAYS$get_catalogs()
-
 Y2010 <- C[['2010']]$get_catalog()
 ```
 
