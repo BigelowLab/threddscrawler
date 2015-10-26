@@ -28,7 +28,7 @@ THREDDS `dataset` comes in two flavors: collections of datasets and direct datas
 
 #### Example from NERACOOS
 
-[NERACOOS](http://www.neracoos.org) exposes data using a THREDDS server.  This is an exampel that draws upon the [MUR SST](https://podaac.jpl.nasa.gov/dataset/JPL-L4UHfnd-GLOB-MUR) data subset prepared in 2015.
+[NERACOOS](http://www.neracoos.org) exposes data using a THREDDS server.  This is an example that draws upon the [MUR SST](https://podaac.jpl.nasa.gov/dataset/JPL-L4UHfnd-GLOB-MUR) data subset prepared in 2015.
 
 We start by examining the [catalog](http://www.neracoos.org/thredds/catalog/GMRI/SST/TESTS/NASA_MUR_SST/catalog.html)  Note that programmatically we access the companion [XML file](http://www.neracoos.org/thredds/catalog/GMRI/SST/TESTS/NASA_MUR_SST/catalog.xml)
 

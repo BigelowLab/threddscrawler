@@ -1,4 +1,20 @@
-
+#' Determine if a vector of names match the greplargs 
+#'
+#' @export
+#' @param x a vector of names
+#' @param greplargs NULL, vector or list
+#' @return logical vector
+grepl_it <- function(x, greplargs = NULL){
+   ix <- rep(FALSE, length(x))
+   if (is.null(greplargs)) return(!ix)
+   if (!is.list(greplargs[[1]])) greplargs <- list(greplargs)
+   
+   for (g in greplargs){
+         ix <- ix | grepl(g[['pattern']], x, fixed = g[['fixed']])
+   }
+   ix
+}
+   
 #' Test if an object inherits from XML::XMLAbstractNode
 #'
 #' @export
