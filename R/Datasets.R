@@ -35,8 +35,8 @@ DatasetsRefClass <- setRefClass("DatasetsRefClass",
       show = function(prefix = ""){
          "show the contents"
          callSuper(prefix = prefix)
-         if (is_xmlNode(.self$node) && (class(.self) == "DatasetsRefClass")){
-            x <- .self$node['catalogRef']
+         if (is_xmlNode(.self$node) && inherits(.self, 'DatasetsRefClass')){
+            x <- .self$node['dataset', all = TRUE]
             nm <- if (length(x) > 0) 
                sapply(x, function(x) XML::xmlAttrs(x)[['name']]) else
                "NA"
@@ -63,5 +63,5 @@ NULL
 DatasetsRefClass$methods(
    get_collection = function(){
       if (!is_xmlNode(.self$node)) return(NULL)
-      lapply(.self$node[['dataset']]['dataset'], parse_node)
+      lapply(.self$node[['dataset']]['dataset', all = TRUE], parse_node)
    })

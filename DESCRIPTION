@@ -20,3 +20,4 @@ Collate:
     'Service.R'
     'TopCatalog.R'
     'misc.R'
+RoxygenNote: 5.0.1

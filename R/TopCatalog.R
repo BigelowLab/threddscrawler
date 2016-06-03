@@ -23,7 +23,7 @@ TopCatalogRefClass <- setRefClass("TopCatalogRef",
          if (is_xmlNode(.self$node)){
             if ("dataset" %in% names(XML::xmlChildren(.self$node))){
                if ("catalogRef" %in% names(XML::xmlChildren(.self$node[['dataset']]))){
-                  x <- sapply(.self$node[['dataset']]['catalogRef'],
+                  x <- sapply(.self$node[['dataset']]['catalogRef', all = TRUE],
                      function(x) {
                         atts <- XML::xmlAttrs(x)
                         natts <- names(atts)
@@ -38,7 +38,7 @@ TopCatalogRefClass <- setRefClass("TopCatalogRef",
                   cat(prefix, "  catalogs: ", paste(x, collapse = " "), "\n", sep = "")
                } #has catalogRef
                if ("dataset" %in% names(XML::xmlChildren(.self$node[['dataset']]))){
-                  x <- sapply(.self$node[['dataset']]['dataset'],
+                  x <- sapply(.self$node[['dataset']]['dataset', all = TRUE],
                      function(x) XML::xmlAttrs(x)[['name']])
                   cat(prefix, "  datasets: ", paste(x, collapse = " "), "\n", sep = "")
                } #has catalogRef
@@ -62,7 +62,7 @@ TopCatalogRefClass$methods(
       
       if ("dataset" %in% names(XML::xmlChildren(.self$node))){
          if ("catalogRef" %in% names(XML::xmlChildren(.self$node[['dataset']]))){
-            x <- lapply(.self$node[['dataset']]['catalogRef'],
+            x <- lapply(.self$node[['dataset']]['catalogRef', all = TRUE],
                function(x, uri = NULL, verbose = FALSE) {
                   n <- parse_node(x, verbose = verbose)
                   n$url <- gsub("catalog.xml", n$href, uri)
@@ -90,7 +90,7 @@ TopCatalogRefClass$methods(
       
       if ("dataset" %in% names(XML::xmlChildren(.self$node))){
          if ("dataset" %in% names(XML::xmlChildren(.self$node[['dataset']]))){
-            x <- lapply(.self$node[['dataset']]['dataset'],
+            x <- lapply(.self$node[['dataset']]['dataset', all = TRUE],
                function(x, uri = NULL, verbose = FALSE) {
                   n <- parse_node(x)
                   n$url <- gsub("catalog.xml", n$name, uri)

@@ -58,13 +58,14 @@ get_catalog <- function(uri, ...){
 #' @param node XML::xmlNode or an httr::response object
 #' @param url character, optional url if a catalog or direct dataset
 #' @param verbose logical, by default FALSE
+#' @param encoding character, by default UTF-8
 #' @return ThreddsNodeRefClass object or subclass
-parse_node <- function(node, url = NULL, verbose = FALSE){
+parse_node <- function(node, url = NULL, verbose = FALSE, encoding = 'UTF-8'){
 
    # given an 'dataset' XML::xmlNode determine if the node is a collection or
    # direct (to data) and return the appropriate data type
    parse_dataset <- function(x, verbose = FALSE){
-      if ('access' %in% names(XML::xmlChildren(x))){
+      if ('dataset' %in% names(XML::xmlChildren(x))){ # was 'access'
          r <- DatasetRefClass$new(x, verbose = verbose)
       } else {
          r <- DatasetsRefClass$new(x, verbose = verbose)
@@ -75,7 +76,8 @@ parse_node <- function(node, url = NULL, verbose = FALSE){
    if (inherits(node, 'response')){
       if (httr::status_code(node) == 200){
          if (is.null(url)) url <- node$url
-         node <- XML::xmlRoot(httr::content(node))
+         cnt <- httr::content(node, type = 'text/xml', encoding = 'UTF-8')
+         node <- XML::xmlRoot(XML::xmlTreeParse(cnt))
       } else {
          cat("response status ==",httr::status_code(node), "\n")
          cat("response url = ", node$url, "\n")
