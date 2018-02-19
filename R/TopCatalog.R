@@ -1,8 +1,8 @@
 # http://www.unidata.ucar.edu/software/thredds/current/tds/catalog/InvCatalogSpec.html#catalog
 # The catalog element is the top-level element. It may contain zero or more
-# service elements, followed by zero or more datasetRoot elements, followed by
+# service elements, followed by zero or more datasetroot elements, followed by
 # zero or more property elements, followed by one or more dataset elements. The
-# base is used to resolve any reletive URLsin the catalog such as catalogRefs,
+# base is used to resolve any reletive URLs in the catalog such as catalogRefs,
 # services, etc. It is usually the URL of the catalog document itself. Optionally
 # the catalog may have a display name. The expires element tells clients when
 # this catalog should be reread, so they can cache the catalog information. The
@@ -11,7 +11,7 @@
 # but should be used to document which version of the schema was used.
 
 #' An catalog representation that sublcasses from ThreddsNodeRefClass
-#' 
+#'
 #' @family Thredds TopCatalog
 #' @include Thredds.R
 #' @export
@@ -19,38 +19,49 @@ TopCatalogRefClass <- setRefClass("TopCatalogRef",
    contains = 'ThreddsNodeRefClass',
    methods = list(
       show = function(prefix = ""){
-         callSuper(prefix = prefix)
-         if (is_xmlNode(.self$node)){
-            if ("dataset" %in% names(XML::xmlChildren(.self$node))){
-               if ("catalogRef" %in% names(XML::xmlChildren(.self$node[['dataset']]))){
-                  x <- sapply(.self$node[['dataset']]['catalogRef', all = TRUE],
-                     function(x) {
-                        atts <- XML::xmlAttrs(x)
-                        natts <- names(atts)
-                        name = ""
-                        if ('name' %in% natts) name <- atts[['name']]
-                        if (!nzchar(name) && ('title' %in% natts) ) name <- atts[['title']]
-                        if (!nzchar(name) && ('ID' %in% natts) ) name <- basename(atts[['ID']])
-                        if (!nzchar(name) && ('href' %in% natts) ) name <- dirname(atts[['href']])
-                        name
-                     })
-                        
-                  cat(prefix, "  catalogs: ", paste(x, collapse = " "), "\n", sep = "")
-               } #has catalogRef
-               if ("dataset" %in% names(XML::xmlChildren(.self$node[['dataset']]))){
-                  x <- sapply(.self$node[['dataset']]['dataset', all = TRUE],
-                     function(x) XML::xmlAttrs(x)[['name']])
-                  cat(prefix, "  datasets: ", paste(x, collapse = " "), "\n", sep = "")
-               } #has catalogRef
-            } #has dataset
-         } #is_xmlNode   
-      })
+         "show the content of the class"
+         cat(prefix, "Reference Class: ", methods::classLabel(class(.self)), "\n", sep = "")
+         cat(prefix, "  verbose_mode: ", .self$verbose_mode, "\n", sep = "")
+         cat(prefix, "  url: ", .self$url, "\n", sep = "")
+         cn <- .self$children_names()
+         if ('dataset' %in% cn){
+            cc <- .self$get_collections()
+            if (length(cc) > 0) {
+                if (length(cc) == 1) {
+                    cn <- gsub("dataset", "dataset-collection", cn, fixed = TRUE)
+                } else {
+                    cn <- gsub('dataset',
+                        sprintf("dataset-collection (%i)", length(cc)), cn)
+                }
+            }
+         }
+         cat(prefix, "  children: ", paste(cn, collapse = " "), "\n", sep = "")
+      }
+      )
    )
-   
+
+
+#' Get a list of CatalogRef Children
+#'
+#' @family TopCatalog
+#' @name TopCatalogRefClass_get_catalogRefs
+#' @return a list of CatalogRefClass, possibly empty
+NULL
+TopCatalogRefClass$methods(
+    get_catalogRefs = function(){
+    x <-  lapply(.self$node %>% xml2::xml_find_all('.//catalogRef'),
+        function(x){
+            n <- parse_node(xml2::xml_ns_strip(x), verbose = .self$verbose_mode)
+            #n$url <- gsub("catalog.xml", n$href, .self$url)
+            n$url <- file.path(dirname(.self$url), n$href)
+            return(n)
+        })
+     if (length(x) > 0) names(x) <- sapply(x, '[[', 'name')
+      return(x)
+   })
 
 
 
-   
 #' Get a list of CatalogRef Children
 #'
 #' @family TopCatalog
@@ -58,27 +69,29 @@ TopCatalogRefClass <- setRefClass("TopCatalogRef",
 #' @return a list of CatalogRefClass, possibly NULL
 NULL
 TopCatalogRefClass$methods(
-   get_catalogs = function(){
-      
-      if ("dataset" %in% names(XML::xmlChildren(.self$node))){
-         if ("catalogRef" %in% names(XML::xmlChildren(.self$node[['dataset']]))){
-            x <- lapply(.self$node[['dataset']]['catalogRef', all = TRUE],
-               function(x, uri = NULL, verbose = FALSE) {
-                  n <- parse_node(x, verbose = verbose)
-                  n$url <- gsub("catalog.xml", n$href, uri)
-                  return(n)
-               }, uri = .self$url, verbose = .self$verbose_mode )
-            names(x) <- sapply(x, "[[", "name")
-         } else {
-            x <- NULL
-         }
-      } else {
-         x <- NULL
-      }
-      return(x)
+    get_catalogs = function(){
+      return(.self$get_catalogRefs())
    })
- 
- 
+
+
+#' Get a list of dataset collections
+#'
+#' There are two types of datasets... direct and collections and the thing that
+#' distinguishes between them is if it contains other datasets.
+#'
+#' @param TopCatalogRefClass_get_collections
+#' @return list of zero of more DatasetsRefClass
+NULL
+TopCatalogRefClass$methods(
+    get_collections = function(){
+        x <-  lapply(.self$node %>% xml2::xml_find_all('dataset'),
+            function(x){
+                n <- parse_node(xml2::xml_ns_strip(x), verbose = .self$verbose_mode)
+                #n$url <- gsub("catalog.xml", n$href, .self$url)
+                return(n)
+            })
+        x
+    })
 #' Get a list of Dataset Children
 #'
 #' @family TopCatalog
@@ -86,23 +99,21 @@ TopCatalogRefClass$methods(
 #' @return a list of DatasetRefClass, possibly NULL
 NULL
 TopCatalogRefClass$methods(
-   get_datasets = function(){
-      
-      if ("dataset" %in% names(XML::xmlChildren(.self$node))){
-         if ("dataset" %in% names(XML::xmlChildren(.self$node[['dataset']]))){
-            x <- lapply(.self$node[['dataset']]['dataset', all = TRUE],
-               function(x, uri = NULL, verbose = FALSE) {
-                  n <- parse_node(x)
-                  n$url <- gsub("catalog.xml", n$name, uri)
-                  return(n)
-               }, uri = .self$url, verbose = .self$verbose_mode )
-            names(x) <- sapply(x, "[[", "name")
-         } else {
-            x <- NULL
-         }
-      } else {
-         x <- NULL
-      }
-      return(x)
+    get_datasets = function(){
+
+        x <- lapply(.self$get_collections(),
+            function(x){
+                xx <- x$get_datasets()
+                if (length(xx) > 0){
+                    xx <- lapply(xx,
+                        function(x) {
+                            x$urlPath <- file.path(dirname(.self$url), basename(x$get_url()))
+                            x
+                        })
+                }
+            })
+        x <- unlist(x)
+        return(x)
    })
 
+#' Retrieve the services as a data frame

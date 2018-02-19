@@ -6,8 +6,11 @@ Depends:
     R (>= 3.0)
 Imports:
     methods,
+    magrittr,
+    dplyr,
+    tibble,
     httr,
-    XML
+    xml2
 Maintainer: Ben Tupper <btupper@bigelow.org>
 Author: Ben Tupper <btupper@bigelow.org>
 URL: https://github.com/btupper/threddscrawler
@@ -15,7 +18,7 @@ License: GPL (>= 2)
 Collate:
     'Thredds.R'
     'Catalog.R'
-    'Datasets.R'
+    'DatasetCollection.R'
     'Dataset.R'
     'Service.R'
     'TopCatalog.R'
