@@ -7,7 +7,7 @@ Depends:
 Imports:
     methods,
     httr,
-    XML
+    xml2
 Maintainer: Ben Tupper <btupper@bigelow.org>
 Author: Ben Tupper <btupper@bigelow.org>
 URL: https://github.com/btupper/threddscrawler
